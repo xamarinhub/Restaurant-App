@@ -25,11 +25,6 @@ build_gateway_api(){
     sh build.sh
 }
 
-build_service_discovery(){
-    cd ./gateway/restaurant-service-discovery/
-    sh build.sh
-}
-
 build_order_api(){
     cd ./services/order.api/
     sh build.sh
@@ -37,6 +32,7 @@ build_order_api(){
 
 build_basket_api() {
     cd ./services/basket.api/
+    echo "#### Building Basket API"
     sh build.sh
 }
 

@@ -15,12 +15,12 @@ namespace Restaurant.Droid.Providers
     {
         private readonly Context _context;
 
-        private MainActivity MainActivity => _context as MainActivity;
-
         public BadgeMenuItemProvider(Context context)
         {
             _context = context;
         }
+
+        private MainActivity MainActivity => _context as MainActivity;
 
         internal void UpdateMenuItemBadge(IMenuItem menuItem, BadgeToolbarItem item)
         {
@@ -35,7 +35,7 @@ namespace Restaurant.Droid.Providers
                 textColor);
 
             var iconDrawable = GetFormsDrawable(item.Icon);
-            
+
             IMenuItemController menuItemController = item;
 
             ActionItemBadge.Update(MainActivity,
@@ -56,6 +56,7 @@ namespace Restaurant.Droid.Providers
                 if (bitmap != null)
                     drawable = new BitmapDrawable(_context.Resources, bitmap);
             }
+
             return drawable;
         }
     }

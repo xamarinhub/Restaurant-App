@@ -1,61 +1,38 @@
 import { NgModule } from '@angular/core';
 
 import { AppComponent } from './app.component';
-import { AddCategoryComponent } from 'app/components/categories/add.component';
-import { AddFoodComponent } from 'app/components/foods/add.component';
-import { ListCategoriesComponent } from 'app/components/categories/list.component';
-import { FoodListComponent } from 'app/components/foods/list.component';
-import { ListUsersComponent } from 'app/components/users/list.component';
-import { CreateUserComponent } from 'app/components/users/create.component';
-import { CategoryService } from 'app/services/category.service';
-import { FoodService } from 'app/services/food.service';
 import { routes } from 'app/app.router';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { HttpModule } from '@angular/http';
-import { CommonModule } from '@angular/common';
-import {
-  MatInputModule,
-  MatFormFieldModule,
-  MatCardModule,
-  MatSidenavModule,
-  MatListModule,
-  MatSelectModule,
-  MatButtonModule,
-  MatToolbarModule, MatIconModule
-} from '@angular/material';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+
+
 import { NavMenuComponent } from './nav-menu/nav-menu.component';
-import { LayoutModule } from '@angular/cdk/layout';
+
+import { AuthCallbackComponent } from './components/auth-callback/auth-callback.component';
+import { AuthGuard } from './services/auth.guard';
+import { ConfirmationDialogComponent } from './components/confirmation-dialog/confirmation-dialog.component';
+import { CategoriesModule } from './components/categories/categories.module';
+import { AccountModule } from './components/account/account.module';
+import { FoodsModule } from './components/foods/foods.module';
+import { SharedModule } from './shared.module';
+import { StorageService } from './services/storage.service';
 
 @NgModule({
   declarations: [
     AppComponent,
-    AddCategoryComponent,
-    ListCategoriesComponent,
-    AddFoodComponent,
-    FoodListComponent,
-    ListUsersComponent,
-    CreateUserComponent,
-    NavMenuComponent
+    NavMenuComponent,
+    AuthCallbackComponent,
+    ConfirmationDialogComponent
+  ],
+  entryComponents: [
+    ConfirmationDialogComponent
   ],
   imports: [
     routes,
-    FormsModule,
-    HttpModule,
-    ReactiveFormsModule,
-    CommonModule,
-    MatCardModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatSidenavModule,
-    MatListModule,
-    MatSelectModule,
-    MatButtonModule, MatIconModule,
-    MatToolbarModule,
-    BrowserAnimationsModule,
-    LayoutModule
+    SharedModule,
+    CategoriesModule,
+    AccountModule,
+    FoodsModule
   ],
-  providers: [FoodService, CategoryService],
+  providers: [AuthGuard, StorageService],
   bootstrap: [AppComponent]
 })
 export class AppModule {}

@@ -1,13 +1,16 @@
-FROM openjdk:8-jdk-alpine as builder
+FROM gradle:5.6-jdk11 as builder
 
 COPY . /usr/src/ordering_api
+USER root
+RUN chown -R gradle:gradle /usr/src/ordering_api
+USER gradle
+
 WORKDIR /usr/src/ordering_api
+RUN gradle build
 
-RUN ./gradlew build
-
-FROM openjdk:8-jdk-alpine
+FROM adoptopenjdk/openjdk11-openj9:alpine-slim
 WORKDIR /root/
 COPY --from=builder /usr/src/ordering_api/build/libs/order.api.jar .
 
 EXPOSE 8090
-CMD ["java", "-jar", "./order.api.jar"]
+CMD java $JAVA_OPTS -Xshareclasses -Xquickstart -jar ./order.api.jar

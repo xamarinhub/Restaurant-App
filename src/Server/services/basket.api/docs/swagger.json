@@ -20,6 +20,11 @@
     "paths": {
         "/items": {
             "post": {
+                "security": [
+                    {
+                        "OAuth": []
+                    }
+                ],
                 "description": "add by json new CustomerBasket",
                 "consumes": [
                     "application/json"
@@ -41,13 +46,6 @@
                             "type": "object",
                             "$ref": "#/definitions/models.CustomerBasket"
                         }
-                    },
-                    {
-                        "type": "string",
-                        "description": "Bearer",
-                        "name": "Authorization",
-                        "in": "header",
-                        "required": true
                     }
                 ],
                 "responses": {
@@ -70,6 +68,11 @@
         },
         "/items/{id}": {
             "get": {
+                "security": [
+                    {
+                        "OAuth": []
+                    }
+                ],
                 "description": "Get CustomerBasket by ID",
                 "consumes": [
                     "application/json"
@@ -88,13 +91,6 @@
                         "name": "id",
                         "in": "path",
                         "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Bearer",
-                        "name": "Authorization",
-                        "in": "header",
-                        "required": true
                     }
                 ],
                 "responses": {
@@ -105,6 +101,43 @@
                             "$ref": "#/definitions/models.CustomerBasket"
                         }
                     },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.HTTPError"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "OAuth": []
+                    }
+                ],
+                "description": "Deletes CustomerBasket by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "CustomerBasket"
+                ],
+                "summary": "Deletes a CustomerBasket",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "CustomerBasket ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {},
                     "400": {
                         "description": "Bad Request",
                         "schema": {
@@ -172,10 +205,13 @@
         }
     },
     "securityDefinitions": {
-        "Identity Server OAuth": {
+        "OAuth": {
             "type": "oauth2",
-            "flow": "application",
-            "tokenUrl": "http://localhost:5000/connect/token"
+            "flow": "implicit",
+            "authorizationUrl": "{{.AuthUrl}}",
+            "scopes": {
+                "basket-api": " Access to basket-api"
+            }
         }
     }
 }

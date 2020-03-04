@@ -3,13 +3,13 @@ import { Observable } from 'rxjs';
 
 export interface IBaseService<T extends IBaseModel> {
 
-    getAll(): Observable<T[]>;
+  BaseUrl: string;
 
-    get(id: string): Observable<T>;
+  getAll(token: string): Observable<T[]>;
 
-    update(model: T): Observable<boolean>;
+  get(id: string, token: string): Observable<T>;
 
-    create(model: T): Observable<boolean>;
+  update(model: T, token: string): Observable<any>;
 
-    baseUrl(id?: string): string;
+  create(model: T, token: string): Observable<any>;
 }

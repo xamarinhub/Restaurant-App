@@ -1,0 +1,35 @@
+name: menu-api
+
+on:
+  push:
+    branches:
+    - develop
+  pull_request:
+    branches:
+    - develop
+    paths:
+    - './src/Server/services/menu.api/**'
+
+jobs:
+  my_job:
+    name: deploy to staging
+    runs-on: ubuntu-18.04
+    steps:
+      - name: Setup .NET Core SDK
+        uses: actions/setup-dotnet@v1.4.0
+        with:
+          dotnet-version: 2.2.104
+      - uses: actions/cache@v1
+        with:
+          path: ~/.nuget/packages
+          key: menu-api-dotnet-cache-key
+          restore-keys: |
+            menu-api-dotnet-cache-key
+      - uses: actions/checkout@v1
+      - name: Build & QA 
+        run: |
+          echo $PATH
+          chmod -R +x ci/
+          ci/build.sh menu_api
+          ci/qa.sh menu_api
+        working-directory: ./src/Server/

@@ -1,23 +1,28 @@
-version: '3.7'
+version: '3'
 
 services:
   gateway-api:
-    environment:
-       - REGISTRY_HOST=service-discovery
-
+    environment: 
+      - IDENTITY_URL=http://identity-api
+      - BASKET_URL=http://basket-api:5200
+      - ORDER_URL=http://order-api:8090
+      - MENU_URL=http://menu-api
+      - DASHBOARD_URL=http://dashboard-app
+  
   order-api:
     environment:
       - REGISTRY_HOST=service-discovery
       - SPRING_DATASOURCE_URL=jdbc:postgresql://pgsql:5432/orderdb
       - SPRING_DATASOURCE_USERNAME=admin
       - SPRING_DATASOURCE_PASSWORD=Passw0rd!
-      - IdentityUrl=http://localhost:8080/identity
+      - IDENTITY_URL_PUB=http://localhost:8080/identity
 
   basket-api:
     environment:
-      - EUREKA_CLIENT_SERVICE_URL=http://service-discovery:8761/eureka
       - REDIS_HOST=redis
-      - IdentityUrl=http://localhost:8080/identity
+      - IDENTITY_URL=http://identity-api
+      - IDENTITY_URL_PUB=http://localhost:8080/identity
+      - BASE_PATH=/basket
   
   pgsql:
     environment:
@@ -30,18 +35,17 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__MenuDatabaseConnectionString=Host=pgsql;Database=menu_database;Username=admin;Password=Passw0rd!
-      - eureka__client__serviceUrl=http://service-discovery:8761/eureka/
-      - eureka__instance__port=80
       - PATH_BASE=/menu
-      - IdentityUrl=http://localhost:8080/identity
+      - IDENTITY_URL_PUB=http://localhost:8080/identity
+      - IDENTITY_URL=http://identity-api
   
   identity-api:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__IdentityConnectionString=Host=pgsql;Database=identity_database;Username=admin;Password=Passw0rd!
-      - eureka__client__serviceUrl=http://service-discovery:8761/eureka/
-      - eureka__instance__port=80
       - PATH_BASE=/identity
       - MENU_API_URL=http://localhost:8080/menu
       - ORDER_API_URL=http://localhost:8080/order
-      - BASKET_API_URL=http://localhost:8080/basket,
+      - BASKET_API_URL=http://localhost:8080/basket
+      - DASHBOARD_URL=http://localhost:8080/dashboard
+      - IDENTITY_URL_PUB=http://localhost:8080/identity

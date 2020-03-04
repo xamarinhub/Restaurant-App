@@ -1,52 +1,60 @@
 import { Injectable } from '@angular/core';
-import { Http } from '@angular/http';
 import { Food } from 'app/models/food';
 import { BaseService } from 'app/services/base.service';
-import { HttpRequest } from '@angular/common/http';
-
-import { ApiUrl } from 'app/config/constants';
+import { HttpRequest, HttpClient, HttpEventType, HttpResponse, HttpHeaders } from '@angular/common/http';
+import { environment } from 'environments/environment';
+import { AuthService } from './auth.service';
+import { Subject, Observable } from 'rxjs';
 
 @Injectable()
 export class FoodService extends BaseService<Food> {
+  private _baseUrl: string | null = null;
 
-
-  constructor(http: Http) {
+  constructor(http: HttpClient) {
     super(http);
   }
 
-  baseUrl(id?: string): string {
-    let entityId = '';
-    if (id) {
-      entityId = '/' + id;
+  get BaseUrl(): string {
+    if (this._baseUrl === null) {
+      this._baseUrl = `${environment.apiUrl}/api/v1/foods`;
     }
-    return ApiUrl + 'foods' + entityId;
+    return this._baseUrl;
   }
 
-  createFood(food: Food, file: File): any {
-    return new HttpRequest('POST', this.baseUrl(), file, {
+  uploadImage(files: File[], foodId: string, token: string): Observable<number> {
+
+    const formData: FormData = new FormData();
+    formData.append('foodId', foodId);
+
+    files.forEach(file => {
+      formData.append('files', file, file.name);
+    });
+
+    const req = new HttpRequest('POST', this.BaseUrl + '/UploadFoodImage', formData, {
       reportProgress: true,
+      headers: new HttpHeaders({
+        'Authorization': token
+      })
     });
-  }
 
-  uploadImage(picture: File, foodId: string) {
-    return new Promise((resolve, reject) => {
-      const xhr: XMLHttpRequest = new XMLHttpRequest();
-      xhr.onreadystatechange = () => {
-        if (xhr.readyState === 4) {
-          if (xhr.status === 200) {
-            resolve(true);
-          } else {
-            reject(false);
-          }
-        }
-      };
+    // create a new progress-subject for every file
+    const progress = new Subject<number>();
 
-      xhr.open('POST', this.baseUrl() + '/UploadFile', true);
+    const startTime = new Date().getTime();
+    this.http.request(req).subscribe(event => {
+      if (event.type === HttpEventType.UploadProgress) {
+        // calculate the progress percentage
 
-      const formData = new FormData();
-      formData.append('file', picture, picture.name);
-      formData.append('foodId', foodId);
-      xhr.send(formData);
+        const percentDone = Math.round((100 * event.loaded) / event.total);
+        // pass the percentage into the progress-stream
+        progress.next(percentDone);
+      } else if (event instanceof HttpResponse) {
+        // Close the progress-stream if we get an answer form the API
+        // The upload is complete
+        progress.complete();
+      }
     });
+
+    return progress.asObservable();
   }
 }

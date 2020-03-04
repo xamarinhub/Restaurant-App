@@ -14,13 +14,13 @@ namespace Restaurant.Droid.Renderers
             _callback = callback;
         }
 
-        public bool OnMenuItemClick(IMenuItem item)
+        public bool OnOptionsItemSelected(IMenuItem p0)
         {
             _callback();
             return true;
         }
 
-        public bool OnOptionsItemSelected(IMenuItem p0)
+        public bool OnMenuItemClick(IMenuItem item)
         {
             _callback();
             return true;

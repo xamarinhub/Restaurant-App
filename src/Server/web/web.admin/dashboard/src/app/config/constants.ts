@@ -1,2 +1,1 @@
-export const ApiUrl = 'http://restaurantserverapi.azurewebsites.net/api/';
-export const ContentUrl = 'http://restaurantserverapi.azurewebsites.net/';
+export const REDIRECT_URL_KEY = 'redirect_url_key';

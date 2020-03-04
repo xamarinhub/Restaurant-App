@@ -2,6 +2,7 @@ package middlewares
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jurabek/basket.api/docs"
@@ -10,12 +11,17 @@ import (
 // RequestMiddleware changes swagger Info on runtime
 func RequestMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if forwardedPrefix := c.Request.Header["X-Forwarded-Prefix"]; forwardedPrefix != nil {
-			docs.SwaggerInfo.BasePath = forwardedPrefix[0] + "/api/v1/"
-			fmt.Printf("Swagger base path: %s\r\n", docs.SwaggerInfo.BasePath)
-		} else {
-			docs.SwaggerInfo.BasePath = "/api/v1/"
+		for key, val := range c.Request.Header {
+			fmt.Printf("Header %s: %s", key, val)
 		}
+		fmt.Printf("Request: %s\r\n", c.Request.RequestURI)
+
+		basePath, _ := os.LookupEnv("BASE_PATH")
+		docs.SwaggerInfo.BasePath = basePath + "/api/v1/"
+		fmt.Printf("Swagger base path: %s\r\n", docs.SwaggerInfo.BasePath)
+
+		docs.SwaggerInfo.Host = "localhost"
+
 		if forwardedHost := c.Request.Header["X-Forwarded-Host"]; forwardedHost != nil {
 			docs.SwaggerInfo.Host = forwardedHost[0]
 			fmt.Printf("Swagger host: %s\r\n", docs.SwaggerInfo.Host)

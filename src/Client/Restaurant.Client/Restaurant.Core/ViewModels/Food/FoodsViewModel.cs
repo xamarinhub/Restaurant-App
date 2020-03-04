@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using AutoMapper;
 using ReactiveUI;
 using Restaurant.Abstractions.Api;
 using Restaurant.Abstractions.Facades;
@@ -16,27 +17,31 @@ namespace Restaurant.Core.ViewModels
 {
     public class FoodsViewModel : BaseViewModel
     {
-        private readonly IFoodDetailViewModelFactory _foodDetailViewModelFactory;
-        private readonly IAutoMapperFacade _autoMapperFacade;
         private readonly IDiagnosticsFacade _diagnosticsFacade;
+        private readonly IFoodDetailViewModelFactory _foodDetailViewModelFactory;
         private readonly IFoodsApi _foodsApi;
+        private readonly IMapper _mapper;
         private readonly INavigationService _navigationService;
+
+        private string _basketItemsCount;
         private ObservableCollection<FoodViewModel> _foods;
         private FoodViewModel _selectedFood;
+
+        private bool foodsLoaded;
 
         internal FoodsViewModel()
         {
         }
 
         public FoodsViewModel(
-            IAutoMapperFacade autoMapperFacade,
+            IMapper mapper,
             IDiagnosticsFacade diagnosticsFacade,
-            IBasketViewModel basketViewModel,
             IFoodsApi foodsApi,
             INavigationService navigationService,
-            IFoodDetailViewModelFactory foodDetailViewModelFactory)
+            IFoodDetailViewModelFactory foodDetailViewModelFactory,
+            IBasketItemsService basketItemsService)
         {
-            _autoMapperFacade = autoMapperFacade;
+            _mapper = mapper;
             _diagnosticsFacade = diagnosticsFacade;
             _foodsApi = foodsApi;
             _navigationService = navigationService;
@@ -46,10 +51,15 @@ namespace Restaurant.Core.ViewModels
                 .Where(x => x != null)
                 .Subscribe(async food => await NavigateToFoodDetail(food));
 
-            GoToBasket =
-                ReactiveCommand.CreateFromTask(async () => await _navigationService.NavigateAsync(BasketViewModel));
+            BasketItemsCount = basketItemsService.ItemsCount;
 
-            BasketViewModel = basketViewModel;
+            basketItemsService.ItemsCountChange
+                .Select(x => x.ToString())
+                .Subscribe(x => BasketItemsCount = x);
+
+            GoToBasket =
+                ReactiveCommand.CreateFromTask(
+                    async () => await _navigationService.NavigateAsync(typeof(IBasketViewModel)));
         }
 
 
@@ -65,13 +75,16 @@ namespace Restaurant.Core.ViewModels
             set => this.RaiseAndSetIfChanged(ref _selectedFood, value);
         }
 
-        public IBasketViewModel BasketViewModel { get; }
 
         public ICommand GoToBasket { get; set; }
 
-        public override string Title => "Foods";
+        public string BasketItemsCount
+        {
+            get => _basketItemsCount;
+            set => this.RaiseAndSetIfChanged(ref _basketItemsCount, value);
+        }
 
-        private bool foodsLoaded = false;
+        public override string Title => "Foods";
 
         public async Task LoadFoods()
         {
@@ -82,10 +95,10 @@ namespace Restaurant.Core.ViewModels
             {
                 IsLoading = true;
                 var foods = await _foodsApi.GetFoods();
-                var foodsViewModel = _autoMapperFacade.Map<IEnumerable<FoodViewModel>>(foods);
+                var foodsViewModel = _mapper.Map<IEnumerable<FoodViewModel>>(foods);
                 Foods = new ObservableCollection<FoodViewModel>(foodsViewModel);
                 foodsLoaded = true;
-                
+
                 IsLoading = false;
             }
             catch (Exception ex)

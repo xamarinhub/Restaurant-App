@@ -1,7 +1,14 @@
 @using Identity.API.Controllers.Account
 @model Identity.API.Controllers.Account.LoginViewModel
 
-<div class="my-login-page">
+@using Microsoft.Extensions.Configuration
+@using Identity.API.Utils
+
+@inject IConfiguration configuration
+@{ var basePath = configuration.GetBasePath(); }
+
+<link rel="stylesheet" href="@basePath/css/my-login.css"/> 
+<div class="my-login-page h-100">
     <section class="h-100">
 		<div class="container h-100">
             <partial name="_ValidationSummary" />
@@ -10,7 +17,7 @@
                 {
                     <div class="card-wrapper">
                         <div class="brand">
-                            <img src="~/logo.jpg" alt="logo">
+                            <img src="@basePath/logo.jpg" alt="logo">
                         </div>
                         <div class="card fat">
                             <div class="card-body">

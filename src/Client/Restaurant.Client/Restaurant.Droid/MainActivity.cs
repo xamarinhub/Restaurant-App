@@ -6,8 +6,8 @@ using Android.Util;
 using Android.Views;
 using Android.Widget;
 using Autofac;
+using ImageCircle.Forms.Plugin.Abstractions;
 using ImageCircle.Forms.Plugin.Droid;
-using Lottie.Forms.Droid;
 using Restaurant.Abstractions.Services;
 using Restaurant.Droid.Renderers;
 using Restaurant.Mobile.UI;
@@ -37,7 +37,7 @@ namespace Restaurant.Droid
             ToolbarResource = Resource.Layout.toolbar;
 
             base.OnCreate(bundle);
-
+            Forms.SetFlags("CollectionView_Experimental");
             Forms.Init(this, bundle);
             ImageCircleRenderer.Init();
             MakeStatusBarTranslucent(false);

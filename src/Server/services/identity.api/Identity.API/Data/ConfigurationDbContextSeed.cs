@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
 using Identity.API.IdentityServer;
@@ -12,6 +13,7 @@ using static Identity.API.Utils.Retry;
 namespace Identity.API.Data
 {
 
+    [ExcludeFromCodeCoverage]
     public class ConfigurationDbContextSeed
     {
         public async Task SeedAsync(
@@ -27,6 +29,7 @@ namespace Identity.API.Data
                 clientUrls.Add("MenuApiUrl", configuration["MENU_API_URL"]);
                 clientUrls.Add("BasketApiUrl", configuration["BASKET_API_URL"]);
                 clientUrls.Add("OrderApiUrl", configuration["ORDER_API_URL"]);
+                clientUrls.Add("DashboardAppUrl", configuration["DASHBOARD_APP_URL"]);
 
                 foreach (var client in Config.GetClients(clientUrls))
                 {
